@@ -1,6 +1,17 @@
 document.addEventListener("DOMContentLoaded", function () {
   const canvas = document.getElementById("gameCanvas");
+  const statusEl = document.getElementById("gameStatus");
+
+  if (!canvas) {
+    statusEl.textContent = "Canvas not supported.";
+    return;
+  }
+
   const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    statusEl.textContent = "Unable to initialize game. Your browser may not support canvas.";
+    return;
+  }
 
   const box = 20;
   let snake;
@@ -15,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
       y: Math.floor(Math.random() * 19) * box,
     };
     direction = null;
+    statusEl.textContent = "Use arrow keys to play!";
   }
 
   document.addEventListener("keydown", (e) => {
@@ -27,17 +39,14 @@ document.addEventListener("DOMContentLoaded", function () {
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw snake
     for (let i = 0; i < snake.length; i++) {
       ctx.fillStyle = i === 0 ? "lime" : "green";
       ctx.fillRect(snake[i].x, snake[i].y, box, box);
     }
 
-    // Draw food
     ctx.fillStyle = "red";
     ctx.fillRect(food.x, food.y, box, box);
 
-    // Move snake
     let headX = snake[0].x;
     let headY = snake[0].y;
 
@@ -46,13 +55,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (direction === "UP") headY -= box;
     if (direction === "DOWN") headY += box;
 
-    // Game over conditions
     if (
       headX < 0 || headY < 0 ||
       headX >= canvas.width || headY >= canvas.height ||
       snake.some((s, index) => index !== 0 && s.x === headX && s.y === headY)
     ) {
       clearInterval(game);
+      statusEl.textContent = "Game Over! Refresh to play again.";
       return;
     }
 
